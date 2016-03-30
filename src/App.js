@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Tabletop from 'tabletop';
 import ReactFauxDOM from 'react-faux-dom';
 import d3 from 'd3';
+import {ScatterChart} from 'rd3';
 
 export class Chart extends Component {
   render() {
@@ -118,27 +119,43 @@ class CardList extends Component {
     this.setState({data: things});
   }
 
-  makeTooltip(data) {
+  tooltipFormat(data) {
     console.log(data);
-    return "true";
+    return JSON.stringify(data);
+  }
+
+  clickFunc(data) {
+    console.log("in clickFunc", data)
   }
   render() {
 
-    var scatterData = [{ x: 15, y: 20 }, { x: 24, y: 12 }, {x: 74, y:84} ];
+    // var scatterData = [{ x: 15, y: 20 }, { x: 24, y: 12 }, {x: 74, y:84} ];
     var cardNodes = this.state.data.map(function(card) {
       return (
         <Card key={card.key} name={card.Name} stage={card.Stage} status={card.Status}>
         </Card>
       );
     });
-
+    var scatterData = [
+      {
+        name: "series1",
+        values: [ { x: 0, y: 20 }, { x: 24, y: 10 } ]
+      },
+      {
+        name: "series3",
+        values: [ { x: 70, y: 82 }, { x: 76, y: 82 } ]
+      }
+    ];
     return (
       <div>
-        <Chart
-          data={scatterData}
-          width={500}
-          height={400}
-        />
+      <ScatterChart
+        data={scatterData}
+        showTooltip={false}
+        onMouseDown={this.clickFunc}
+        XtooltipFormat={this.tooltipFormat}
+        width={500}
+        height={400}
+      />
         <div className="cardList">
           {cardNodes}
         </div>
