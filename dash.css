@@ -36,8 +36,30 @@ path.line {
 .demo-card-square > .mdl-card__title {
   color: #fff;
   height: 176px;
-	background-color: #3E4EB8
 }
+
+.demo-card-square > .mdl-card__title.concept {
+	background-color: #1f77b4
+}
+
+.demo-card-square > .mdl-card__title.prototype {
+	background-color: #ff7f0e
+}
+
+.demo-card-square > .mdl-card__title.marketvalidation {
+	background-color: #2ca02c
+}
+
+.demo-card-square > .mdl-card__title.product {
+	background-color: #d62728
+}
+
+
+.mdl-card__title-text  a {
+  color: #fff;
+	/*text-decoration: none;*/
+}
+
 .demo-card-square > .mdl-card__menu {
   color: #fff;
 }

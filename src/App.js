@@ -4,88 +4,21 @@ import ReactFauxDOM from 'react-faux-dom';
 import d3 from 'd3';
 import {ScatterChart} from 'rd3';
 
-export class Chart extends Component {
-  render() {
-    var data = this.props.data
-    var margin = {top: 20, right: 20, bottom: 30, left: 50}
-    var width = this.props.width;
-    var height = this.props.height;
-
-    var parseDate = d3.time.format('%d-%b-%y').parse
-
-    var x = d3.scale.linear()
-    .range([0, width])
-    var y = d3.scale.linear()
-    .range([height, 0])
-    var z = d3.scale.category10();
-
-    var xAxis = d3.svg.axis()
-    .scale(x)
-    .innerTickSize(2)
-    .outerTickSize(-1)
-    .ticks(5)
-    .orient('bottom')
-
-    var yAxis = d3.svg.axis()
-    .outerTickSize(1)
-    .scale(y)
-    .orient('left')
-
-    var line = d3.svg.line()
-    .x(function (d) { return x(d.x) })
-    .y(function (d) { return y(d.y) })
-
-    var node = ReactFauxDOM.createElement('svg')
-    var svg = d3.select(node)
-    .attr('width', width + margin.left + margin.right)
-    .attr('height', height + margin.top + margin.bottom)
-    .append('g')
-    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-
-    x.domain(d3.extent(data, function (d) { return d.x })).nice();
-    y.domain(d3.extent(data, function (d) { return d.y })).nice();
-
-    svg.append('g')
-    .attr('class', 'x axis')
-    .attr('transform', 'translate(0,' + height + ')')
-    .call(xAxis)
-
-    svg.append('g')
-    .attr('class', 'y axis')
-    .call(yAxis)
-    .append('text')
-    .attr('transform', 'rotate(-90)')
-    .attr('y', 2)
-    .attr('dy', '.01em')
-    .style('text-anchor', 'end')
-    // .text('Price ($)')
-    //
-    svg.selectAll(".point")
-        .data(data)
-      .enter().append("path")
-        .attr("class", "point")
-        .style("fill", function(d, i) { return z(i); })
-        .attr("d", d3.svg.symbol().type("circle"))
-        .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
-
-    return node.toReact()
-  }
-}
-
 export class Card extends Component {
   render() {
+    let cName = "mdl-card__title mdl-card--expand "+ this.props.stage.replace(' ', '').toLowerCase();
     return (
       <div className="entry">
         <div className="demo-card-square mdl-card mdl-shadow--2dp">
-          <div className="mdl-card__title mdl-card--expand">
-            <h2 className="mdl-card__title-text">{this.props.name}</h2>
+          <div className={cName}>
+            <h2 className="mdl-card__title-text"><a href={this.props.URL}>{this.props.name}</a></h2>
           </div>
           <div className="mdl-card__supporting-text">
           {this.props.status}
           </div>
           <div className="mdl-card__actions mdl-card--border">
             <a className="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect">
-            {this.props.stage}
+            Stage: {this.props.stage}
             </a>
           </div>
         </div>
@@ -110,50 +43,95 @@ class CardList extends Component {
                      parseNumbers: true } );
   }
   showInfo(data, tabletop) {
-    console.log("DATA", data, data.Sheet1.elements);
+    // console.log("DATA", data, data.Sheet1.elements);
     let things = data.Sheet1.elements.map(function(thing) {
       thing.key = thing.Name;
       return thing;
     })
-    console.log(things);
     this.setState({data: things});
   }
 
   tooltipFormat(data) {
-    console.log(data);
-    return JSON.stringify(data);
+    return data.data.Name
   }
 
   clickFunc(data) {
     console.log("in clickFunc", data)
   }
+  tickFormat(tickValue) {
+    if (tickValue == 30) return 'gate 0';
+    if (tickValue == 50) return 'gate 1';
+    if (tickValue == 70) return 'gate 2';
+    return '';
+  }
   render() {
-
-    // var scatterData = [{ x: 15, y: 20 }, { x: 24, y: 12 }, {x: 74, y:84} ];
     var cardNodes = this.state.data.map(function(card) {
       return (
-        <Card key={card.key} name={card.Name} stage={card.Stage} status={card.Status}>
+        <Card key={card.key} URL={card.URL} name={card.Name} stage={card.Stage} status={card.Status}>
         </Card>
       );
     });
-    var scatterData = [
-      {
-        name: "series1",
-        values: [ { x: 0, y: 20 }, { x: 24, y: 10 } ]
-      },
-      {
-        name: "series3",
-        values: [ { x: 70, y: 82 }, { x: 76, y: 82 } ]
+    var conceptItems = [];
+    var prototypesItems = [];
+    var marketvalidationItems = [];
+    var productItems = [];
+    var list = null;
+    var x = 0, y=0;
+    this.state.data.map(function(entry) {
+      if (entry.Stage == "Concept") {
+        list = conceptItems;
+        x = 20;
+      } else if (entry.Stage == "Prototype") {
+        list = prototypesItems;
+        x = 40;
+      } else if (entry.Stage == "Market Validation") {
+        list = marketvalidationItems;
+        x = 60;
+      } else if (entry.Stage == "Product") {
+        list = productItems;
+        x = 80;
       }
-    ];
+      y = 100 - (list.length+1) * (18 + Math.random()*6);
+      list.push({x: x, y: y, entry: entry})
+    })
+
+    var concepts = {
+      name: "Concepts",
+      values: conceptItems
+    };
+    var prototypes = {
+      name: "Prototypes",
+      values: prototypesItems
+    };
+    var marketvalidation = {
+      name: "Market Validation",
+      values: marketvalidationItems
+    };
+    var products = {
+      name: "Product",
+      values: productItems
+    };
+    var scatterData = [concepts, prototypes, marketvalidation, products];
+    console.log("scatterData", scatterData);
     return (
       <div>
       <ScatterChart
         data={scatterData}
-        showTooltip={false}
+        legend={true}
+        circleRadius={12}
+        xAxisFormatter={this.tickFormat}
+        yAxisTickValues={[]}
+        yAxisStrokeWidth={0}
+        sideOffset={140}
+        colors={d3.scale.category10()}
+        domain={{x: [0,100], y: [0,100]}}
+        xAxisTickValues={[30,50,70]}
+        gridVertical={true}
+        gridHorizontalStroke={'#000'}
+        showTooltip={true}
         onMouseDown={this.clickFunc}
-        XtooltipFormat={this.tooltipFormat}
-        width={500}
+        tooltipFormat={this.tooltipFormat}
+        width={900}
         height={400}
       />
         <div className="cardList">
@@ -165,9 +143,6 @@ class CardList extends Component {
 }
 
 export default class App extends Component {
-  formatter () {
-    return "foo";
-  }
   render() {
     return (
       <div>
@@ -182,13 +157,12 @@ export default class App extends Component {
             </div>
           </header>
           <div className="mdl-layout__drawer">
-            <span className="mdl-layout-title">MoFo Research</span>
+            <span className="mdl-layout-title">Innovation Dashboard</span>
             <nav className="mdl-navigation">
               <a className="mdl-navigation__link" href="">About this site</a>
             </nav>
           </div>
           <main className="mdl-layout__content">
-
             <CardList></CardList>
           </main>
         </div>
