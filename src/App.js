@@ -96,7 +96,7 @@ class CardList extends Component {
     })
 
     var concepts = {
-      name: "Concepts",
+      name: "Documented concepts",
       values: conceptItems
     };
     var prototypes = {
@@ -104,11 +104,11 @@ class CardList extends Component {
       values: prototypesItems
     };
     var marketvalidation = {
-      name: "Market Validation",
+      name: "Initial external validation",
       values: marketvalidationItems
     };
     var products = {
-      name: "Product",
+      name: "Significant benefits at Scale",
       values: productItems
     };
     var scatterData = [concepts, prototypes, marketvalidation, products];
